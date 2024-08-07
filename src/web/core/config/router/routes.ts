@@ -1,0 +1,98 @@
+export enum SwitchRoutesAdmin {
+  Notifications = "/admin/notifications",
+  AddNotification = "/admin/notifications/addnotification",
+  EditNotification = "/admin/notifications/editnotification",
+  NotificationsDetails = "/admin/notifications",
+  Categories = "/admin/categories",
+  CategoryDetails = "/admin/categories/details",
+  Login = "/admin/login",
+  InsurancePanel = "/admin/insurancePanel",
+  InsuranceDetail = "/admin/insurancePanel",
+  EditInsuranceRequest = "/admin/insurancePanel/editInsuranceRequest",
+}
+
+export enum SwitchRoutesBuilderio {
+  home = "/home",
+  homeWeb = "/home-content-web",
+  whereToSave = "/where-to-save",
+  card = "/card",
+  promotions = "/promotions",
+  insurance = "/insurance",
+  insurancePets = "/insurance-pets",
+  insuranceHealth = "/insurance-health",
+  insuranceLife = "/insurance-life",
+  insuranceDeath = "/insurance-death",
+  travel = "/travel",
+  company = "/company",
+  generalConditions = "/condiciones-generales-de-uso-app",
+  privacyPolicy = "/politica-de-privacidad",
+  security = "/seguridad",
+  faq = "/faq",
+  fourthSection = "/fourth-section",
+  thirdSection = "/third-section",
+  homeCampaing = "/home-campaing",
+  homeDetails = "/home-details",
+}
+
+export enum SwitchRoutesWeb {
+  Home = "/home",
+  Login = "/login",
+  Welcome = "/welcome",
+  Contact = "/contact",
+  MapAssociatedCompanies = "/map-associated-companies",
+  AssociatedDetails = "/map-associated-companies/details",
+  Addresses = "/addresses",
+  Latitude = "?latitude",
+  Longitude = "&longitude",
+  GeneralConditions = "/generalconditions",
+  DataProtection = "/dataprotection",
+  PasswordRecovery = "/passwordrecovery",
+  PrivacyPolicy = "/privacypolicy",
+  Register = "/register",
+  Account = "/account",
+  AccountSavings = "/account/savings",
+  AccountTransactions = "/account/transactions",
+  AccountInsurances = "/account/insurances",
+  AccountUserDetail = "/account/accountDetail",
+  AccountNotifications = "/account/notifications",
+  AccountDetail = "/account/details",
+  AccountIncome = "/account/income",
+  AccountHelp = "/account/help",
+  AccountRequestCard = "/account/cards/request",
+  AccountRequestCardInfo = "/account/cards/request/info",
+  AccountRequestCardSuccess = "/account/cards/request/success",
+  EmailValidation = "/email-validation",
+  SmsValidation = "/smsvalidation",
+  InsuranceForm = "/insuranceform",
+  transactions = "/cards/transactions",
+  transactionsDetails = "/account/cards/transactions/details",
+  appleCallback = "/callback/apple",
+  googleCallback = "/callback/google",
+  facebookCallback = "/callback/facebook",
+  confirmationEmail = "/confirmation-email",
+  AccountLinkCard = "/account/cards/link",
+  RequestCard = "/cards/request",
+  RequestCardInfo = "/cards/request/info",
+  RequestCardSuccess = "/cards/request/success",
+  Verify= "/verify",
+  Verified= "/verified",
+  OnlineShopExternalLink = "https://www.ventajon.com/tiendas-online"
+}
+
+export enum SwitchRoutesCompanies {
+  login = "/companies/login",
+  register = "/companies/register",
+  home = "/companies/home",
+  invoiceDetails = "/companies/invoices",
+  retrievePassword = "/companies/password-recovery",
+  Invoices = "/companies/invoices",
+  Contact = "/companies/contact",
+}
+
+export enum SwitchRoutesErrorPage {
+  NotFound = "/error",
+}
+
+export enum SwitchRoutesAssetsPage {
+  Assets = "/assets",
+}
