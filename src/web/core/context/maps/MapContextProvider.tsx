@@ -42,13 +42,6 @@ export const MapContextProvider: React.FC<{
   // Function to update the map active tab
   const updateMapActiveTab = (tab: string) => setMapActiveTab(tab);
 
-  // Filter cleaning function
-  const clearFilters = () => {
-    setCategory(undefined);
-    setBranches(bra);
-    setSearch("");
-  };
-
   const initialClusters = (
     initialZoom: number, 
     initialLatLng: LatLng,
@@ -178,60 +171,23 @@ export const MapContextProvider: React.FC<{
     typeEasFilter: TypeEasFilterEnum,
     category?: WebMapCategoryModel
   ) => {
-    let branchesLimit;
-    const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
-    const zoom = leafletMap?.getZoom() ?? 3.0;
-    const branchesNear = WebClusterController.sortBranchesFromCenterMapPoints(
-      branches,
-      zoom,
-      latLng
-    );
-    switch (typeEasFilter) {
-      case TypeEasFilterEnum.distance:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
-        break;
-      case TypeEasFilterEnum.highestDiscount:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
-        branchesLimit.sort((a, b) => {
-          const aDiscount =
-            a.company.current_discount > a.company.general_discount
-              ? a.company.current_discount
-              : a.company.general_discount;
-          const bDiscount =
-            b.company.current_discount > b.company.general_discount
-              ? b.company.current_discount
-              : b.company.general_discount;
-
-          const higherDiscount = bDiscount - aDiscount;
-
-          return higherDiscount;
-        });
-        break;
-      case TypeEasFilterEnum.AscendingOrder:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit.sort((a, b) => {
-          if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return -1;
-          if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return 1;
-          return 0;
-        });
-        break;
-      case TypeEasFilterEnum.DescendingOrder:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit.sort((a, b) => {
-          if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return -1;
-          if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return 1;
-          return 0;
-        });
-        break;
-      case TypeEasFilterEnum.novelty:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit = branchesLimit.filter((item) => item.is_novelty);
-        branchesLimit.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
-        break;
+    let branchesFiltered: WebMapBranchModel[] = [];
+    let isHighestDiscounts: boolean = typeEasFilter === TypeEasFilterEnum.highestDiscount;
+    
+    if( isHighestDiscounts ){
+      const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
+      const zoom = leafletMap?.getZoom() ?? 3.0;
+      branchesFiltered = WebClusterController.sortBranchesFromCenterMapPoints(
+        branches,
+        zoom,
+        latLng
+      );
+      branchesFiltered = checkEasFilterType( branchesFiltered, search, typeEasFilter, category );
+    } else {
+      branchesFiltered = checkEasFilterType( branches, search, typeEasFilter, category );
     }
-    setBranchesList(branchesLimit);
+
+    setBranchesList(branchesFiltered);
   };
 
 
@@ -241,15 +197,22 @@ export const MapContextProvider: React.FC<{
     typeEasFilter: TypeEasFilterEnum,
     category?: WebMapCategoryModel,
   ) => {
-    let branchesLimit;
-    const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
-    const zoom = leafletMap?.getZoom() ?? 3.0;
-    const branchesNear = WebClusterController.sortBranchesFromCenterMapPoints(
-      branches,
-      zoom,
-      latLng
-    );
-    const branchesFiltered = checkEasFilterType( branchesNear, search, typeEasFilter, category );
+    let branchesFiltered: WebMapBranchModel[] = [];
+    
+
+    if( typeEasFilter === TypeEasFilterEnum.highestDiscount ){
+      const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
+      const zoom = leafletMap?.getZoom() ?? 3.0;
+      branchesFiltered = WebClusterController.sortBranchesFromCenterMapPoints(
+        branches,
+        zoom,
+        latLng
+      );
+      branchesFiltered = checkEasFilterType( branchesFiltered, search, typeEasFilter, category );
+    } else {
+      branchesFiltered = checkEasFilterType( branches, search, typeEasFilter, category );
+    }
+
     setVerticalList(branchesFiltered);
   };
 
