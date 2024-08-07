@@ -146,7 +146,7 @@ export const MapContextProvider: React.FC<{
     );
     switch (typeEasFilter) {
       case TypeEasFilterEnum.distance:
-        branchesLimit = branches.filter((item) => isBranchMatch(item, search, category));
+        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
         branchesLimit.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
         break;
       case TypeEasFilterEnum.highestDiscount:
@@ -168,7 +168,7 @@ export const MapContextProvider: React.FC<{
         });
         break;
       case TypeEasFilterEnum.AscendingOrder:
-        branchesLimit = branches.filter((item) => isBranchMatch(item, search, category));
+        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
         branchesLimit.sort((a, b) => {
           if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return -1;
           if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return 1;
@@ -176,7 +176,7 @@ export const MapContextProvider: React.FC<{
         });
         break;
       case TypeEasFilterEnum.DescendingOrder:
-        branchesLimit = branches.filter((item) => isBranchMatch(item, search, category));
+        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
         branchesLimit.sort((a, b) => {
           if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return -1;
           if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return 1;

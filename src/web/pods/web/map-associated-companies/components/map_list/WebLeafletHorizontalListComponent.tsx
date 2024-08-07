@@ -22,6 +22,8 @@ const WebLeafletHorizontalListComponent = () => {
 
   const router = useRouter();
 
+  console.log(branchesList);
+
   return (
     <>
       {branchesList.length > 0 ? (

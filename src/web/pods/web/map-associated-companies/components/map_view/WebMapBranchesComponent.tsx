@@ -11,6 +11,7 @@ import { WebMapBranchModel, WebMapClusterModel } from "../../models";
 
 export const WebMapBranchesComponent: React.FC<{}> = () => {
   const [filterFlag, setFilterFlag] = useState(false);
+  const [notUpdateAtMoveEnd, setNotUpdateAtMoveEnd] = useState(false);
   const mapContext = useContext(MapDataContext);
   const { selectedMarket } = useContext(UserContext);
 
@@ -40,6 +41,15 @@ export const WebMapBranchesComponent: React.FC<{}> = () => {
     moveend: () => {
       const branchesToUse = mapFilterList === TypeEasFilterEnum.novelty ? noveltyBranches : branches;
       updateClusters(branchesToUse, search, category);
+
+      if (mapFilterList === TypeEasFilterEnum.highestDiscount && !notUpdateAtMoveEnd) {
+        const branchesFromClusters = getAllBranches(clusters);
+        updateVerticalList(branchesFromClusters, search, category);
+        updateHorizontalList(branchesFromClusters, search, category);
+      } else {
+        setNotUpdateAtMoveEnd(false);
+      }
+      
     },
   });
 
@@ -81,9 +91,13 @@ export const WebMapBranchesComponent: React.FC<{}> = () => {
             key={index}
             ref={(ref) => {
               ref?.addEventListener("click", () => {
-                updateHorizontalList(cluster.branches, search, category);
+
                 if (mapFilterList === TypeEasFilterEnum.highestDiscount) {
+                  setNotUpdateAtMoveEnd(true);
                   updateVerticalList(cluster.branches, search, category);
+                  updateHorizontalList(cluster.branches, search, category);
+                } else {
+                  updateHorizontalList(cluster.branches, search, category);
                 }
                 if (map.getZoom() + 3 > 18) {
                   map.flyTo(cluster.center, 18, { duration: 0.5 });
