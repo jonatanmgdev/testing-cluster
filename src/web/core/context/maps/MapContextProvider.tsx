@@ -69,7 +69,7 @@ export const MapContextProvider: React.FC<{
 
 
   // Function to update branches on the horizontal list
-  const updateBranchesList = (
+  const updateHorizontalList = (
     branches: WebMapBranchModel[],
     search: string,
     category?: WebMapCategoryModel
@@ -279,7 +279,7 @@ export const MapContextProvider: React.FC<{
     mapActiveTab,
     updateMapActiveTab,
     branchesList: branchesList,
-    updateBranchesList: updateBranchesList,
+    updateHorizontalList: updateHorizontalList,
     updateVerticalList: updateVerticalList,
     verticalList: verticalList,
     getNoveltyBranches: getNoveltyBranches,

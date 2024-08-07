@@ -21,7 +21,7 @@ export interface MapContextProps {
     verticalList: WebMapBranchModel[]
     updateVerticalList: ( branches: WebMapBranchModel[], search: string, category?: WebMapCategoryModel ) => void;
     branchesList: WebMapBranchModel[];
-    updateBranchesList: ( branches: WebMapBranchModel[], search: string, category?: WebMapCategoryModel ) => void;
+    updateHorizontalList: ( branches: WebMapBranchModel[], search: string, category?: WebMapCategoryModel ) => void;
     categories: WebMapCategoryModel[],
     category: WebMapCategoryModel | undefined,
     updateCategory: ( category: WebMapCategoryModel ) => void;
