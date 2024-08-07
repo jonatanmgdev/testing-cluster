@@ -7,13 +7,11 @@ import { Marker, useMapEvents } from "react-leaflet";
 import { UserContext } from "@/web/core/context/user/UserContext";
 import { LatLng } from "leaflet";
 import { TypeEasFilterEnum } from "@/web/core/context/maps/enum/TypeEasFilterEnum";
-import { WebMapBranchModel, WebMapClusterModel } from "../../models";
 
 export const WebMapBranchesComponent: React.FC<{}> = () => {
-  const [filterFlag, setFilterFlag] = useState(false);
-  const [notUpdateAtMoveEnd, setNotUpdateAtMoveEnd] = useState(false);
   const mapContext = useContext(MapDataContext);
   const { selectedMarket } = useContext(UserContext);
+  const [avoidMapMove, setAvoidMapMove] = useState(false);
 
   if (!mapContext) throw new Error("Map context is not available");
 
@@ -22,62 +20,40 @@ export const WebMapBranchesComponent: React.FC<{}> = () => {
     branches,
     category,
     clusters,
-    mapFilterList,
+    easTypeFilterSelected,
     updateLeafletMap,
     updateClusters,
     initialClusters,
     updateHorizontalList,
     updateVerticalList,
-    getNoveltyBranches,
-    noveltyBranches,
   } = mapContext;
-
-
-  function getAllBranches(clusters: WebMapClusterModel[]): WebMapBranchModel[] {
-    return clusters.flatMap((cluster) => cluster.branches);
-  }
 
   const map = useMapEvents({
     moveend: () => {
-      const branchesToUse = mapFilterList === TypeEasFilterEnum.novelty ? noveltyBranches : branches;
-      updateClusters(branchesToUse, search, category);
-
-      if (mapFilterList === TypeEasFilterEnum.highestDiscount && !notUpdateAtMoveEnd) {
-        const branchesFromClusters = getAllBranches(clusters);
-        updateVerticalList(branchesFromClusters, search, category);
-        updateHorizontalList(branchesFromClusters, search, category);
+      // Se actualiza los clusters cuando la animación de la cámara ha finalizado.
+      updateClusters( branches, search, easTypeFilterSelected, category );
+      if( easTypeFilterSelected === TypeEasFilterEnum.highestDiscount && !avoidMapMove ){
+        updateHorizontalList( branches, search, easTypeFilterSelected, category );
+        updateVerticalList( branches, search, easTypeFilterSelected, category );
       } else {
-        setNotUpdateAtMoveEnd(false);
-      }
-      
-    },
-  });
-
-  useEffect(() => {
-    if (mapFilterList !== null && mapFilterList !== undefined && filterFlag || search || category) {
-      if (mapFilterList === TypeEasFilterEnum.novelty) {
-        updateClusters(noveltyBranches, search, category);
-        updateVerticalList(noveltyBranches, search, category);
-        updateHorizontalList(noveltyBranches, search, category);
-      } else {
-        const branchesToUse = mapFilterList === TypeEasFilterEnum.highestDiscount ? getAllBranches(clusters) : branches;
-        updateClusters(branchesToUse, search, category);
-        updateVerticalList(branchesToUse, search, category);
-        updateHorizontalList(branchesToUse, search, category);
+        setAvoidMapMove(false);
       }
     }
-  }, [mapFilterList, search, category]);
+  });
 
+  useEffect(() => { 
+    updateClusters( branches, search, easTypeFilterSelected, category );
+    updateVerticalList( branches, search, easTypeFilterSelected, category );
+    updateHorizontalList( branches, search, easTypeFilterSelected, category );
+  }, [easTypeFilterSelected, search, category]);
+
+  // Use Effect initial only
   useEffect(() => {
     updateLeafletMap(map);
     initialClusters(
       selectedMarket.zoom_level,
-      new LatLng(selectedMarket.latitude, selectedMarket.longitude)
+      new LatLng(selectedMarket.latitude, selectedMarket.longitude )
     );
-    updateVerticalList(branches, search, category);
-    updateHorizontalList(branches, search, category);
-    getNoveltyBranches();
-    setFilterFlag(true);
   }, []);
 
   return (
@@ -91,13 +67,13 @@ export const WebMapBranchesComponent: React.FC<{}> = () => {
             key={index}
             ref={(ref) => {
               ref?.addEventListener("click", () => {
-
-                if (mapFilterList === TypeEasFilterEnum.highestDiscount) {
-                  setNotUpdateAtMoveEnd(true);
-                  updateVerticalList(cluster.branches, search, category);
-                  updateHorizontalList(cluster.branches, search, category);
+                
+                if( easTypeFilterSelected === TypeEasFilterEnum.highestDiscount ){
+                  updateVerticalList(cluster.branches, search, easTypeFilterSelected, category);
+                  updateHorizontalList( cluster.branches, search, easTypeFilterSelected, category );
+                  setAvoidMapMove(true);
                 } else {
-                  updateHorizontalList(cluster.branches, search, category);
+                  updateHorizontalList( cluster.branches, search, easTypeFilterSelected, category );
                 }
                 if (map.getZoom() + 3 > 18) {
                   map.flyTo(cluster.center, 18, { duration: 0.5 });

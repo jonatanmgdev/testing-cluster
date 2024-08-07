@@ -9,13 +9,14 @@ import { DropdownOption } from "./dropdown/interfaces/DropdownOption";
 export const WebMapHeaderFilterComponent: React.FC<{}> = () => {
     const mapContext = useContext(MapDataContext);
     if (!mapContext) throw new Error('Map context is not available');
-    const { updateMapFilterList, mapFilterList } = mapContext;
+    const { updateEasTypeFilter, easTypeFilterSelected } = mapContext;
 
-    const [filterSelected, setFilterSelected] = useState<TypeEasFilterEnum>(TypeEasFilterEnum.distance);
+    const [dropdownFilter, setDropdownFilter] = useState<TypeEasFilterEnum>(easTypeFilterSelected);
 
     useEffect(() => {
-        updateMapFilterList( filterSelected );
-    }, [mapFilterList, filterSelected, updateMapFilterList]);
+        // Se actualiza el estado cuando cambia el dropdown o se le asigan un easTypeFilterSelected del MapContext
+        updateEasTypeFilter( dropdownFilter );
+    }, [easTypeFilterSelected, dropdownFilter, updateEasTypeFilter])
 
     const FilterOptionsToMapper : DataMapperDropdown[] = [
         {
@@ -52,19 +53,19 @@ export const WebMapHeaderFilterComponent: React.FC<{}> = () => {
                 const selectedValue = parseInt( option.key );
                 switch( selectedValue ){
                     case TypeEasFilterEnum.distance:
-                        setFilterSelected( TypeEasFilterEnum.distance );
+                        setDropdownFilter( TypeEasFilterEnum.distance );
                     break;
                     case TypeEasFilterEnum.highestDiscount:
-                        setFilterSelected( TypeEasFilterEnum.highestDiscount );
+                        setDropdownFilter( TypeEasFilterEnum.highestDiscount );
                     break;
                     case TypeEasFilterEnum.AscendingOrder:
-                        setFilterSelected( TypeEasFilterEnum.AscendingOrder );
+                        setDropdownFilter( TypeEasFilterEnum.AscendingOrder );
                     break;
                     case TypeEasFilterEnum.DescendingOrder:
-                        setFilterSelected( TypeEasFilterEnum.DescendingOrder );
+                        setDropdownFilter( TypeEasFilterEnum.DescendingOrder );
                     break;
                     case TypeEasFilterEnum.novelty:
-                        setFilterSelected( TypeEasFilterEnum.novelty );
+                        setDropdownFilter( TypeEasFilterEnum.novelty );
                     break;
                 }
             }}

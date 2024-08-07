@@ -25,7 +25,7 @@ export const MapContextProvider: React.FC<{
   // States to store different map and app data
   const [leafletMap, setMap] = useState<Map>();
   const [mapActiveTab, setMapActiveTab] = useState<string>("map");
-  const [typeEasFilter, setEasFilter] = useState<TypeEasFilterEnum>(TypeEasFilterEnum.distance);
+  const [typeEasFilter, setTypeEasFilter] = useState<TypeEasFilterEnum>(TypeEasFilterEnum.distance);
   const [markets, setMarkets] = useState<WebMapMarketModel[]>(mar);
   const [branches, setBranches] = useState<WebMapBranchModel[]>(bra);
   const [branchesList, setBranchesList] = useState<WebMapBranchModel[]>([]);
@@ -49,29 +49,133 @@ export const MapContextProvider: React.FC<{
     setSearch("");
   };
 
-  const initialClusters = (initialZoom: number, initialLatLng: LatLng) => {
+  const initialClusters = (
+    initialZoom: number, 
+    initialLatLng: LatLng,
+  ) => {
     const clusters = WebClusterController.clusterPoints(bra, initialZoom, initialLatLng);
     setClusters(clusters);
+    getNoveltyBranches();
   };
 
   // Function to update marker clusters on the map
   const updateClusters = (
-    branchess: WebMapBranchModel[],
+    branches: WebMapBranchModel[],
     search: string,
-    category?: WebMapCategoryModel
-  ) => {
+    typeEasFilter: TypeEasFilterEnum,
+    category?: WebMapCategoryModel,
+  ) => {;
     const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
     const leafletZoom = leafletMap?.getZoom() ?? 3.0;
-    const founds = branchess.filter((item) => isBranchMatch(item, search, category));
-    const clusters = WebClusterController.clusterPoints(founds, leafletZoom, latLng);
+    const branchesFiltered = checkEasFilterType( branches, search, typeEasFilter, category );
+    const clusters = WebClusterController.clusterPoints(branchesFiltered, leafletZoom, latLng);
     setClusters(clusters);
   };
+
+
+  function checkEasFilterType(
+    branches: WebMapBranchModel[],
+    search: string,
+    typeEasFilter: TypeEasFilterEnum,
+    category?: WebMapCategoryModel,
+  ) : WebMapBranchModel[] {   
+    switch( typeEasFilter ) {
+      case TypeEasFilterEnum.distance:
+        return branchesFilterDistance( branches, search, category );
+      case TypeEasFilterEnum.highestDiscount:
+        return branchesFilterHighestDiscount( branches, search, category );
+      case TypeEasFilterEnum.AscendingOrder:
+        return branchesFilterAscendingOrder( branches, search, category );
+      case TypeEasFilterEnum.DescendingOrder:
+        return branchesFilterDescendingOrder( branches, search, category );
+      case TypeEasFilterEnum.novelty:
+        return branchesFilterNovelty(search, category);
+    }
+  }
+
+  // Esta funcion solo se encarga de filtrar el listado que le pase por la distasncia mas cercana
+  function branchesFilterDistance( 
+    branches: WebMapBranchModel[],
+    search: string,
+    category?: WebMapCategoryModel
+  ) : WebMapBranchModel[] {
+    let branchesFiltered = branches.filter((item) => isBranchMatch(item, search, category));
+    branchesFiltered.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
+    return branches;
+  }
+
+  // Esta funcion solo se encarga de filtrar el listado de branches por el mayor descuento
+  function branchesFilterHighestDiscount( 
+    branches: WebMapBranchModel[],
+    search: string,
+    category?: WebMapCategoryModel
+  ) : WebMapBranchModel[] {
+    let branchesFiltered = branches.filter((item) => isBranchMatch(item, search, category));
+    branchesFiltered.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
+    branchesFiltered.sort((a, b) => {
+      const aDiscount =
+        a.company.current_discount > a.company.general_discount
+          ? a.company.current_discount
+          : a.company.general_discount;
+      const bDiscount =
+        b.company.current_discount > b.company.general_discount
+          ? b.company.current_discount
+          : b.company.general_discount;
+
+      const higherDiscount = bDiscount - aDiscount;
+      return higherDiscount;
+    });
+    return branchesFiltered;
+  }
+
+  // Esta funcion solo se encarga de filtrar el listado por alfabetico ascedente
+  function branchesFilterAscendingOrder( 
+    branches: WebMapBranchModel[],
+    search: string,
+    category?: WebMapCategoryModel
+  ) : WebMapBranchModel[]{
+    let branchesFiltered = branches.filter((item) => isBranchMatch(item, search, category));
+    branchesFiltered.sort((a, b) => {
+      if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return -1;
+      if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return 1;
+      return 0;
+    });
+    return branchesFiltered;
+  }
+
+  // Esta funcón solo se encarga de filtrar el listgado por albaetico descendente
+  function branchesFilterDescendingOrder( 
+    branches: WebMapBranchModel[],
+    search: string,
+    category?: WebMapCategoryModel
+  ) : WebMapBranchModel[] {
+    let branchesFiltered = branches.filter((item) => isBranchMatch(item, search, category));
+    branchesFiltered.sort((a, b) => {
+      if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return -1;
+      if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return 1;
+      return 0;
+    });
+    return branchesFiltered;
+  }
+
+  // Esta funcion solo se encarga de filtrar solo las novelty
+  function branchesFilterNovelty(
+    search: string,
+    category?: WebMapCategoryModel
+  ) : WebMapBranchModel[] {
+    let branchesFiltered = noveltyBranches.filter((item) => isBranchMatch(item, search, category));
+    branchesFiltered.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
+    return branchesFiltered;
+  }
+
+  
 
 
   // Function to update branches on the horizontal list
   const updateHorizontalList = (
     branches: WebMapBranchModel[],
     search: string,
+    typeEasFilter: TypeEasFilterEnum,
     category?: WebMapCategoryModel
   ) => {
     let branchesLimit;
@@ -134,7 +238,8 @@ export const MapContextProvider: React.FC<{
   const updateVerticalList = (
     branches: WebMapBranchModel[],
     search: string,
-    category?: WebMapCategoryModel
+    typeEasFilter: TypeEasFilterEnum,
+    category?: WebMapCategoryModel,
   ) => {
     let branchesLimit;
     const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
@@ -144,60 +249,15 @@ export const MapContextProvider: React.FC<{
       zoom,
       latLng
     );
-    switch (typeEasFilter) {
-      case TypeEasFilterEnum.distance:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
-        break;
-      case TypeEasFilterEnum.highestDiscount:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
-        branchesLimit.sort((a, b) => {
-          const aDiscount =
-            a.company.current_discount > a.company.general_discount
-              ? a.company.current_discount
-              : a.company.general_discount;
-          const bDiscount =
-            b.company.current_discount > b.company.general_discount
-              ? b.company.current_discount
-              : b.company.general_discount;
-
-          const higherDiscount = bDiscount - aDiscount;
-
-          return higherDiscount;
-        });
-        break;
-      case TypeEasFilterEnum.AscendingOrder:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit.sort((a, b) => {
-          if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return -1;
-          if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return 1;
-          return 0;
-        });
-        break;
-      case TypeEasFilterEnum.DescendingOrder:
-        branchesLimit = branchesNear.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit.sort((a, b) => {
-          if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return -1;
-          if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return 1;
-          return 0;
-        });
-        break;
-      case TypeEasFilterEnum.novelty:
-        branchesLimit = noveltyBranches.filter((item) => isBranchMatch(item, search, category));
-        branchesLimit = branchesLimit.filter((item) => item.is_novelty);
-        branchesLimit.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
-        break;
-    }
-    setVerticalList(branchesLimit);
+    const branchesFiltered = checkEasFilterType( branchesNear, search, typeEasFilter, category );
+    setVerticalList(branchesFiltered);
   };
 
-  // Function to filter branches on the Map based on isNovelty Filter
-  const getNoveltyBranches = () => {
-    let noveltyBranches = branches ?? [];
-    noveltyBranches = branches.filter((item) => isBranchMatch(item, search, category));
-    noveltyBranches = branches.filter((item) => item.is_novelty);
-    setNoveltyBranches(noveltyBranches);
+  // This function return novelty branches
+  function getNoveltyBranches() {
+    let noveltyBranches = bra.filter((item) => isBranchMatch(item, search, category));
+    noveltyBranches = bra.filter((item) => item.is_novelty);
+    setNoveltyBranches( noveltyBranches );
   }
 
   // Function to update the selected category
@@ -266,15 +326,15 @@ export const MapContextProvider: React.FC<{
     setSearch(valueStr);
   };
 
-  const updateMapFilterList = (value: number) => {
-    setEasFilter(value);
+  const updateEasTypeFilter = (value: number) => {
+    setTypeEasFilter(value);
   };
 
   // Map context value passed to child components
   const contextValue: MapContextProps = {
     leafletMap,
-    mapFilterList: typeEasFilter,
-    updateMapFilterList,
+    easTypeFilterSelected: typeEasFilter,
+    updateEasTypeFilter,
     updateLeafletMap,
     mapActiveTab,
     updateMapActiveTab,
