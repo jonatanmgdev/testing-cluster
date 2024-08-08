@@ -3,10 +3,10 @@ import { SwitchRoutesWeb } from "@/web/core/config/router";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
+import DataTable from "react-data-table-component";
 import NoveltyCard from "../novelty_card/NoveltyCard";
 import { MapDataContext } from "@/web/core/context/maps/MapContext";
 import { WebMapBranchModel } from "../../models";
-import DataTable from 'react-data-table-component';
 
 const rowsPerPageOptions = [10, 25, 30];
 export const WebLeafletListPaginationComponent = () => {
@@ -26,6 +26,18 @@ export const WebLeafletListPaginationComponent = () => {
     const endIndex = startIndex + rowsPerPage;
     setDisplayedMembers(verticalList.slice(startIndex, endIndex));
   }, [verticalList, page, rowsPerPage]);
+
+  const convertDistance = (meters: number): string => {
+    const kilometers = meters / 1000; // Convert meters to kilometers
+    if (kilometers < 1) {
+      const formattedMeters = meters.toFixed(2).replace('.', ',');
+      return `${formattedMeters} m`;
+    } else {
+      const roundedKilometers = Math.round(kilometers * 100) / 100;
+      const formattedKilometers = roundedKilometers.toFixed(2).replace('.', ',');
+      return `${formattedKilometers} km`;
+    }
+  };
 
   const tableContent = [
     {
@@ -67,7 +79,7 @@ export const WebLeafletListPaginationComponent = () => {
             </p>
           )}
           <p data-tag="allowRowEvents" className="text-left">
-            {row.distanceInMeters / 1000} m {row.locality}
+            {convertDistance (row.distanceInMeters)} {row.locality}
           </p>
         </div>
       ),

@@ -1,7 +1,6 @@
 "use client";
 
 import { UserContext, UserContextProps } from "@/web/core/context/user/UserContext";
-
 import { getUserAgent } from "@/web/utils/getUserAgent";
 import { ReactNode, useEffect, useState } from "react";
 import { ApiResponse, CookieNames, marketCookieTypes } from "../../config";
@@ -10,9 +9,9 @@ import { getCookieValue, setCookie } from "@/web/utils";
 import { Market } from "@/web/types/web";
 import { getMarkets } from "./WebMarketsApi";
 import { useSearchParams } from "next/navigation";
-import { AccountUserData, userSettingsInitialState } from "@/web/pods/web/account/models/user";
+import { LatLng } from "leaflet";
 import { getAccount } from "@/web/pods/web/account/WebAccount-Api";
-
+import { AccountUserData, userSettingsInitialState } from "@/web/pods/web/account/models/user";
 
 export const accountDataInitialState: AccountUserData = {
   phone: "",
@@ -46,6 +45,7 @@ export const UserContextProvider = ({ children, webAuth, marketCookie }: Context
   const userAgent: string = getUserAgent();
   const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(webAuth?.token !== undefined);
   const [marketSelected, setMarketSelected] = useState<marketCookieTypes>(marketCookie as marketCookieTypes);
+  const [userLatLngData, setUserLatLng] = useState<LatLng>({lat: marketSelected.latitude, lng: marketSelected.longitude} as LatLng);
   const searchParams = useSearchParams();
   let marketParam = searchParams.get("market");
 
@@ -150,6 +150,8 @@ export const UserContextProvider = ({ children, webAuth, marketCookie }: Context
     isMarketsLoading,
     userInfo,
     setUserInfo,
+    setUserLatLng,
+    userLatLng: userLatLngData,
     resetUserInfo,
     getUser,
     isUserLoading,

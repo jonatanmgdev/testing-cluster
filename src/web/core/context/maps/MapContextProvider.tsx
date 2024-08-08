@@ -28,7 +28,7 @@ export const MapContextProvider: React.FC<{
   const [typeEasFilter, setTypeEasFilter] = useState<TypeEasFilterEnum>(TypeEasFilterEnum.distance);
   const [markets, setMarkets] = useState<WebMapMarketModel[]>(mar);
   const [branches, setBranches] = useState<WebMapBranchModel[]>(bra);
-  const [branchesList, setBranchesList] = useState<WebMapBranchModel[]>([]);
+  const [horizontalList, setHorizontalList] = useState<WebMapBranchModel[]>([]);
   const [verticalList, setVerticalList] = useState<WebMapBranchModel[]>([]);
   const [noveltyBranches, setNoveltyBranches] = useState<WebMapBranchModel[]>([]);
   const [categories, setCategories] = useState<WebMapCategoryModel[]>(cat);
@@ -53,57 +53,72 @@ export const MapContextProvider: React.FC<{
 
   // Function to update marker clusters on the map
   const updateClusters = (
-    branches: WebMapBranchModel[],
-    search: string,
-    typeEasFilter: TypeEasFilterEnum,
-    category?: WebMapCategoryModel,
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    easFilter: TypeEasFilterEnum,
+    userLatLng: LatLng,
+    categorySelected?: WebMapCategoryModel,
   ) => {;
     const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
     const leafletZoom = leafletMap?.getZoom() ?? 3.0;
-    const branchesFiltered = checkEasFilterType( branches, search, typeEasFilter, category );
+    let branchesFiltered = checkEasFilterType( branchess, searchBranch, easFilter, userLatLng, categorySelected );
     const clusters = WebClusterController.clusterPoints(branchesFiltered, leafletZoom, latLng);
     setClusters(clusters);
   };
 
 
   function checkEasFilterType(
-    branches: WebMapBranchModel[],
-    search: string,
-    typeEasFilter: TypeEasFilterEnum,
-    category?: WebMapCategoryModel,
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    easFilter: TypeEasFilterEnum,
+    userLatLng: LatLng,
+    categorySelected?: WebMapCategoryModel,
   ) : WebMapBranchModel[] {   
-    switch( typeEasFilter ) {
+    switch( easFilter ) {
       case TypeEasFilterEnum.distance:
-        return branchesFilterDistance( branches, search, category );
+        return branchesFilterDistance( branchess, searchBranch, userLatLng, categorySelected );
       case TypeEasFilterEnum.highestDiscount:
-        return branchesFilterHighestDiscount( branches, search, category );
+        return branchesFilterHighestDiscount( branchess, searchBranch, categorySelected );
       case TypeEasFilterEnum.AscendingOrder:
-        return branchesFilterAscendingOrder( branches, search, category );
+        return branchesFilterAscendingOrder( branchess, searchBranch, categorySelected );
       case TypeEasFilterEnum.DescendingOrder:
-        return branchesFilterDescendingOrder( branches, search, category );
+        return branchesFilterDescendingOrder( branchess, searchBranch, categorySelected );
       case TypeEasFilterEnum.novelty:
-        return branchesFilterNovelty(search, category);
+        return branchesFilterNovelty(branchess, searchBranch, categorySelected);
     }
   }
 
   // Esta funcion solo se encarga de filtrar el listado que le pase por la distasncia mas cercana
   function branchesFilterDistance( 
-    branches: WebMapBranchModel[],
-    search: string,
-    category?: WebMapCategoryModel
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    userLatLng: LatLng,
+    categorySelected?: WebMapCategoryModel
   ) : WebMapBranchModel[] {
-    let branchesFiltered = branches.filter((item) => isBranchMatch(item, search, category));
-    branchesFiltered.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
-    return branches;
+    let branchesFiltered = branchess.filter((item) => isBranchMatch(item, searchBranch, categorySelected));
+    branchesFiltered = sortBranchesFromDistance(branchesFiltered, userLatLng);
+    return branchesFiltered;
+  }
+
+  function sortBranchesFromDistance(
+    branchess: WebMapBranchModel[],
+    userLatLng: LatLng
+  ) : WebMapBranchModel[] {
+    for( const branch of branchess ) {
+      const branchLatLng = new LatLng(branch.latitude, branch.longitude);
+      branch.distanceInMeters = WebClusterController.calculateDistance(userLatLng, branchLatLng);
+    }
+    branchess.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
+    return branchess;
   }
 
   // Esta funcion solo se encarga de filtrar el listado de branches por el mayor descuento
   function branchesFilterHighestDiscount( 
-    branches: WebMapBranchModel[],
-    search: string,
-    category?: WebMapCategoryModel
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    categorySelected?: WebMapCategoryModel
   ) : WebMapBranchModel[] {
-    let branchesFiltered = branches.filter((item) => isBranchMatch(item, search, category));
+    let branchesFiltered = branchess.filter((item) => isBranchMatch(item, searchBranch, categorySelected));
     branchesFiltered.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
     branchesFiltered.sort((a, b) => {
       const aDiscount =
@@ -123,26 +138,28 @@ export const MapContextProvider: React.FC<{
 
   // Esta funcion solo se encarga de filtrar el listado por alfabetico ascedente
   function branchesFilterAscendingOrder( 
-    branches: WebMapBranchModel[],
-    search: string,
-    category?: WebMapCategoryModel
-  ) : WebMapBranchModel[]{
-    let branchesFiltered = branches.filter((item) => isBranchMatch(item, search, category));
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    categorySelected?: WebMapCategoryModel
+  ) : WebMapBranchModel[] {
+    let branchesFiltered = branchess.filter((item) => isBranchMatch(item, searchBranch, categorySelected));
     branchesFiltered.sort((a, b) => {
       if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return -1;
-      if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return 1;
-      return 0;
+      if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return 1;  
+      return 0; 
     });
+  
     return branchesFiltered;
   }
+  
 
   // Esta funcón solo se encarga de filtrar el listgado por albaetico descendente
   function branchesFilterDescendingOrder( 
-    branches: WebMapBranchModel[],
-    search: string,
-    category?: WebMapCategoryModel
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    categorySelected?: WebMapCategoryModel
   ) : WebMapBranchModel[] {
-    let branchesFiltered = branches.filter((item) => isBranchMatch(item, search, category));
+    let branchesFiltered = branchess.filter((item) => isBranchMatch(item, searchBranch, categorySelected));
     branchesFiltered.sort((a, b) => {
       if (replaceVowelAccents(a.name) > replaceVowelAccents(b.name)) return -1;
       if (replaceVowelAccents(a.name) < replaceVowelAccents(b.name)) return 1;
@@ -153,10 +170,11 @@ export const MapContextProvider: React.FC<{
 
   // Esta funcion solo se encarga de filtrar solo las novelty
   function branchesFilterNovelty(
-    search: string,
-    category?: WebMapCategoryModel
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    categorySelected?: WebMapCategoryModel
   ) : WebMapBranchModel[] {
-    let branchesFiltered = noveltyBranches.filter((item) => isBranchMatch(item, search, category));
+    let branchesFiltered = branchess.filter((item) => isBranchMatch(item, searchBranch, categorySelected));
     branchesFiltered.sort((a, b) => a.distanceInMeters - b.distanceInMeters);
     return branchesFiltered;
   }
@@ -166,51 +184,48 @@ export const MapContextProvider: React.FC<{
 
   // Function to update branches on the horizontal list
   const updateHorizontalList = (
-    branches: WebMapBranchModel[],
-    search: string,
-    typeEasFilter: TypeEasFilterEnum,
-    category?: WebMapCategoryModel
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    easFilter: TypeEasFilterEnum,
+    userLatLng: LatLng,
+    categorySelected?: WebMapCategoryModel
   ) => {
-    let branchesFiltered: WebMapBranchModel[] = [];
-    let isHighestDiscounts: boolean = typeEasFilter === TypeEasFilterEnum.highestDiscount;
-    
-    if( isHighestDiscounts ){
+    let branchesFiltered: WebMapBranchModel[] = [];    
+    if( easFilter === TypeEasFilterEnum.highestDiscount ){
       const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
       const zoom = leafletMap?.getZoom() ?? 3.0;
       branchesFiltered = WebClusterController.sortBranchesFromCenterMapPoints(
-        branches,
+        branchess,
         zoom,
         latLng
       );
-      branchesFiltered = checkEasFilterType( branchesFiltered, search, typeEasFilter, category );
+      branchesFiltered = checkEasFilterType( branchesFiltered, searchBranch, easFilter,userLatLng, categorySelected );
     } else {
-      branchesFiltered = checkEasFilterType( branches, search, typeEasFilter, category );
+      branchesFiltered = checkEasFilterType( branchess, searchBranch, easFilter,userLatLng, categorySelected );
     }
-
-    setBranchesList(branchesFiltered);
+    setHorizontalList(branchesFiltered);
   };
 
 
   const updateVerticalList = (
-    branches: WebMapBranchModel[],
-    search: string,
-    typeEasFilter: TypeEasFilterEnum,
-    category?: WebMapCategoryModel,
+    branchess: WebMapBranchModel[],
+    searchBranch: string,
+    easFilter: TypeEasFilterEnum,
+    userLatLng: LatLng,
+    categorySelected?: WebMapCategoryModel,
   ) => {
     let branchesFiltered: WebMapBranchModel[] = [];
-    
-
-    if( typeEasFilter === TypeEasFilterEnum.highestDiscount ){
+    if( easFilter === TypeEasFilterEnum.highestDiscount ){
       const latLng = leafletMap?.getCenter() ?? new LatLng(0, 0);
       const zoom = leafletMap?.getZoom() ?? 3.0;
       branchesFiltered = WebClusterController.sortBranchesFromCenterMapPoints(
-        branches,
+        branchess,
         zoom,
         latLng
       );
-      branchesFiltered = checkEasFilterType( branchesFiltered, search, typeEasFilter, category );
+      branchesFiltered = checkEasFilterType( branchesFiltered, searchBranch, easFilter,userLatLng, categorySelected );
     } else {
-      branchesFiltered = checkEasFilterType( branches, search, typeEasFilter, category );
+      branchesFiltered = checkEasFilterType( branchess, searchBranch, easFilter,userLatLng, categorySelected );
     }
 
     setVerticalList(branchesFiltered);
@@ -218,8 +233,7 @@ export const MapContextProvider: React.FC<{
 
   // This function return novelty branches
   function getNoveltyBranches() {
-    let noveltyBranches = bra.filter((item) => isBranchMatch(item, search, category));
-    noveltyBranches = bra.filter((item) => item.is_novelty);
+    let noveltyBranches = branches.filter((item) => item.is_novelty);
     setNoveltyBranches( noveltyBranches );
   }
 
@@ -244,15 +258,15 @@ export const MapContextProvider: React.FC<{
   // Function to determine if a branch matches the search and category
   const isBranchMatch = (
     branch: WebMapBranchModel,
-    search: string,
-    category?: WebMapCategoryModel
+    searchBranch: string,
+    categorySelected?: WebMapCategoryModel
   ): boolean => {
-    const normalizedSearch = replaceVowelAccents(search);
+    const normalizedSearch = replaceVowelAccents(searchBranch);
     let branchContains = false;
 
     // Selected category and no search exists
-    if (category !== undefined && search === "") {
-      return branch.company.category_id === category.id;
+    if (categorySelected !== undefined && searchBranch === "") {
+      return branch.company.category_id === categorySelected.id;
     }
 
     // There is a search, we analyze what matches exist.
@@ -277,8 +291,8 @@ export const MapContextProvider: React.FC<{
     }
 
     // If it has found a match with search, it checks if the selected category exists.
-    if (branchContains && category != undefined) {
-      return branch.company.category_id === category.id;
+    if (branchContains && categorySelected != undefined) {
+      return branch.company.category_id === categorySelected.id;
     }
     return branchContains;
   };
@@ -301,7 +315,7 @@ export const MapContextProvider: React.FC<{
     updateLeafletMap,
     mapActiveTab,
     updateMapActiveTab,
-    branchesList: branchesList,
+    horizontalList: horizontalList,
     updateHorizontalList: updateHorizontalList,
     updateVerticalList: updateVerticalList,
     verticalList: verticalList,

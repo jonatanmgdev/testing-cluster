@@ -1,22 +1,26 @@
 "use client";
 
 import { Context, createContext, Dispatch, SetStateAction } from "react";
+
 import { Market } from "@/web/types/web";
+import { LatLng } from "leaflet";
 import { AccountUserData, accountUserDataInitialState } from "@/web/pods/web/account/models/user";
 
 export interface UserContextProps {
   markets: Market[];
   selectedMarket: Market;
-  setMarkets: Dispatch<SetStateAction<Market[]>>;
-  handleMarketForUser: (market: string) => Promise<void>;
   isMarketsLoading: boolean;
   userInfo: AccountUserData;
-  setUserInfo: Dispatch<SetStateAction<AccountUserData>>;
-  resetUserInfo?: () => void;
-  getUser?: () => Promise<void>;
+  userLatLng: LatLng;
   isUserLoading?: boolean;
   isUserLoggedIn?: boolean;
+  setUserInfo: Dispatch<SetStateAction<AccountUserData>>;
+  setUserLatLng: Dispatch<SetStateAction<LatLng>>;
+  setMarkets: Dispatch<SetStateAction<Market[]>>;
+  handleMarketForUser: (market: string) => Promise<void>;
+  getUser?: () => Promise<void>;
   setIsUserLoggedIn?: Dispatch<SetStateAction<boolean>>;
+  resetUserInfo?: () => void;
 }
 
 const userContextInitialValue: UserContextProps = {
@@ -25,6 +29,8 @@ const userContextInitialValue: UserContextProps = {
   setMarkets: () => {},
   handleMarketForUser: async () => {},
   isMarketsLoading: false,
+  userLatLng: {} as LatLng,
+  setUserLatLng: () => {},
   userInfo: accountUserDataInitialState,
   setUserInfo: () => {},
 };

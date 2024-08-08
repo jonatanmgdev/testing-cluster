@@ -25,6 +25,7 @@ export interface MapContextProps {
     branches: WebMapBranchModel[],
     search: string,
     typeEasFilter: TypeEasFilterEnum,
+    userLatLng: LatLng,
     category?: WebMapCategoryModel
   ) => void;
 
@@ -41,15 +42,17 @@ export interface MapContextProps {
     branches: WebMapBranchModel[],
     search: string,
     typeEasFilter: TypeEasFilterEnum,
+    userLatLng: LatLng,
     category?: WebMapCategoryModel
   ) => void;
 
-  branchesList: WebMapBranchModel[];
+  horizontalList: WebMapBranchModel[];
   
   updateHorizontalList: (
     branches: WebMapBranchModel[],
     search: string,
     typeEasFilter: TypeEasFilterEnum,
+    userLatLng: LatLng,
     category?: WebMapCategoryModel
   ) => void;
 

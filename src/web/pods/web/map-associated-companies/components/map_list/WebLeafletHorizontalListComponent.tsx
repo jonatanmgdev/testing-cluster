@@ -3,12 +3,12 @@ import React, { useContext, useEffect } from "react";
 import { MapDataContext } from "@/web/core/context/maps/MapContext";
 import { useRouter } from "next/navigation";
 import { SwitchRoutesWeb } from "@/web/core/config/router";
-
 import { CommonSlider } from "@/web/common/components/slider/CommonSlider";
 import { SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import NoveltyCard from "../novelty_card/NoveltyCard";
-import { CommonButton } from '../button/CommonButton';
+import { CommonButton } from "../button";
+
 
 // TODO(Mingo): Hacer de nuevo la lista independiente al cluster y la lista vertical.
 const WebLeafletHorizontalListComponent = () => {
@@ -18,17 +18,15 @@ const WebLeafletHorizontalListComponent = () => {
   if (!mapContext) throw new Error("Map context is not available");
 
   // Extract important variables from the map context
-  const { branchesList } = mapContext;
+  const { horizontalList } = mapContext;
 
   const router = useRouter();
 
-  console.log(branchesList);
-
   return (
     <>
-      {branchesList.length > 0 ? (
+      {horizontalList.length > 0 ? (
         <CommonSlider swiperContainerHeight={310} spaceBetween={10}>
-          {branchesList.slice(0, Math.min(10, branchesList.length)).map((branch, index) => (
+          {horizontalList.slice(0, Math.min(10, horizontalList.length)).map((branch, index) => (
             <SwiperSlide key={index} style={{ width: "auto", height: "300px" }}>
               <div className="card flex flex-col max-w-[320px] min-h-[280px] rounded-lg bg-white p-6 shadow-md justify-around">
                 <div

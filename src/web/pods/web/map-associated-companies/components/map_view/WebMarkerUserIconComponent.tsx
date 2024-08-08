@@ -1,14 +1,17 @@
 'use client';
 import { MapDataContext } from '@/web/core/context/maps/MapContext';
+import { UserContext } from '@/web/core/context/user/UserContext';
 import L, { ErrorEvent, LatLng, LeafletEvent, LocationEvent, Map } from 'leaflet';
 import { useContext, useEffect, useRef, useState } from 'react';
 
 export const WebMarkerUserPositionComponent = () => {
     const mapContext = useContext(MapDataContext);
+    const { setUserLatLng } = useContext(UserContext);
     if (!mapContext) throw new Error('Map context is not available');
 
     const { leafletMap } = mapContext;
     const [ userPosition, setUserPosition] = useState<LatLng>();
+
     const [ currentZoom, setCurrentZoom ] = useState<number>();
     const markerRef = useRef<L.Marker>(); 
 
@@ -65,6 +68,7 @@ export const WebMarkerUserPositionComponent = () => {
     const onLocationFound = ( event: LocationEvent ) => {
         const { lat, lng } = event.latlng;
         setUserPosition(new LatLng(lat, lng));
+        setUserLatLng(new LatLng(lat, lng));
     };
 
     const onLocationError = ( error: ErrorEvent) => {
