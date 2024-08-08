@@ -105,79 +105,96 @@ export const WebLeafletListPaginationComponent = () => {
 
   return (
     <div>
-      <Table>
-        <TableBody>
-          {displayedMembers.map((row) => (
-            <TableRow
-              key={row.code}
-              onClick={() => handleRowClick(row)}
-              className="cursor-pointer hover:bg-gray-100"
-            >
-              <TableCell className="flex items-center">
-                <Avatar className="mr-4">
-                  {row.company.logo ? (
-                    <Image
-                      alt={`${row.company.logo} ${row.company.name}`}
-                      src={row.company.logo}
-                      width={80}
-                      height={80}
-                      style={{ objectFit: "contain", maxHeight: "80px" }}
-                    />
-                  ) : (
-                    <AvatarFallback>
-                      {row.company.name[0].toUpperCase()}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <div className="flex flex-col">
-                  {row.is_novelty && (
-                    <div className="justify-self-end mb-2">
-                      <NoveltyCard />
-                    </div>
-                  )}
-                  <p className="text-left font-bold">{row.company.name}</p>
-                  <p className="text-left">{row.company.about}</p>
-                  {row.company.current_discount >
-                  row.company.general_discount ? (
-                    <p className="text-left text-red-700 font-bold">
-                      {row.company.current_discount} % Descuento en Efectivo
-                    </p>
-                  ) : (
-                    <p className="text-left text-red-700 font-bold">
-                      {row.company.general_discount} % Descuento en Efectivo
-                    </p>
-                  )}
-                  <p className="text-left text-gray-600">
-                    {convertDistance(row.distanceInMeters)} {row.locality}
-                  </p>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <div className="flex justify-between items-center mt-4">
-        <div>
-          <select
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(Number(e.target.value));
-              setPage(0); // Reset to the first page when changing rows per page
-            }}
-            className="p-2 border rounded-md"
-          >
-            {rowsPerPageOptions.map((option) => (
-              <option key={option} value={option}>
-                {option} por página
-              </option>
-            ))}
-          </select>
+      {displayedMembers.length === 0 ? (
+        <div className="flex flex-col items-center justify-center gap-2 py-12">
+          <h2>¡Vaya!</h2>
+          <p>
+            De momento no tenemos Empresas Asociadas de este sector en tu zona,
+            pero seguimos trabajando para incorporar más y más empresas donde
+            poder ahorrar.
+          </p>
         </div>
+      ) : (
+        <>
+          <Table>
+            <TableBody>
+              {displayedMembers.map((row) => (
+                <TableRow
+                  key={row.code}
+                  onClick={() => handleRowClick(row)}
+                  className="cursor-pointer hover:bg-gray-100"
+                >
+                  <TableCell className="flex items-center">
+                    <Avatar className="mr-4">
+                      {row.company.logo ? (
+                        <Image
+                          alt={`${row.company.logo} ${row.company.name}`}
+                          src={row.company.logo}
+                          width={80}
+                          height={80}
+                          style={{ objectFit: "contain", maxHeight: "80px" }}
+                        />
+                      ) : (
+                        <AvatarFallback>
+                          {row.company.name[0].toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <div className="flex flex-col">
+                      {row.is_novelty && (
+                        <div className="justify-self-end mb-2">
+                          <NoveltyCard />
+                        </div>
+                      )}
+                      <p className="text-left font-bold">
+                        {row.company.name}
+                      </p>
+                      <p className="text-left">{row.company.about}</p>
+                      {row.company.current_discount >
+                      row.company.general_discount ? (
+                        <p className="text-left text-red-700 font-bold">
+                          {row.company.current_discount} % Descuento en
+                          Efectivo
+                        </p>
+                      ) : (
+                        <p className="text-left text-red-700 font-bold">
+                          {row.company.general_discount} % Descuento en
+                          Efectivo
+                        </p>
+                      )}
+                      <p className="text-left text-gray-600">
+                        {convertDistance(row.distanceInMeters)} {row.locality}
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
-        {/* Pagination Buttons */}
-        {renderPaginationButtons()}
-      </div>
+          <div className="flex justify-between items-center mt-4">
+            <div>
+              <select
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setPage(0); // Reset to the first page when changing rows per page
+                }}
+                className="p-2 border rounded-md"
+              >
+                {rowsPerPageOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option} por página
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Pagination Buttons */}
+            {renderPaginationButtons()}
+          </div>
+        </>
+      )}
     </div>
   );
 };
