@@ -1,9 +1,7 @@
 "use client";
 import React, { ReactNode } from "react";
 import Image from "next/image";
-import { MapContainer, Marker, TileLayer, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { WebMarkerSingleIconComponent } from "../components";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { useRouter } from "next/navigation";
 import { SwitchRoutesWeb } from "@/web/core/config/router";
@@ -13,6 +11,12 @@ import { WebMapBranchModel, WebMapSocialMediaModel } from "../models";
 import { ApiResponse } from "@/web/core/config";
 import { apiStatus } from "@/web/core/config/apiResponseAdapter";
 import { CommonButton } from "../components/button";
+import dynamic from "next/dynamic";
+const WebAssociatedDetailsMapWrapper = dynamic(
+  () => import("./WebAssociatedDetailsMapWrapper"),
+  { ssr: false }
+);
+
 
 interface WebAssociatedDetailsProps {
   associatedDetails?: ApiResponse<WebMapBranchModel>;
@@ -51,15 +55,6 @@ export const WebAssociatedDetailsComponent = ({ associatedDetails }: WebAssociat
     website_1,
     website_2,
   } = data;
-
-  const HandleMapClick = () => {
-    useMapEvents({
-      click() {
-        handleDirectionsClick();
-      },
-    });
-    return null;
-  };
 
   const handleDirectionsClick = () => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
@@ -235,24 +230,7 @@ export const WebAssociatedDetailsComponent = ({ associatedDetails }: WebAssociat
                       </CommonButton>
                     </div>
                   </div>
-                  <MapContainer
-                    center={[latitude, longitude]}
-                    zoom={13}
-                    dragging={false}
-                    scrollWheelZoom={false}
-                    doubleClickZoom={false}
-                    touchZoom={false}
-                    zoomControl={false}
-                    attributionControl={false}
-                    style={{ height: "400px", width: "100%" }}
-                  >
-                    <TileLayer
-                      url="https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}?language=es&region=ES"
-                      subdomains={["mt0", "mt1", "mt2", "mt3"]}
-                    />
-                    <Marker position={[latitude, longitude]} icon={WebMarkerSingleIconComponent()} />
-                    <HandleMapClick />
-                  </MapContainer>
+                  {<WebAssociatedDetailsMapWrapper  latitude={latitude} longitude={longitude} />}
                 </div>
               </div>
             </div>
