@@ -15,9 +15,6 @@ export default function WebHeader() {
   const containerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
   const router: AppRouterInstance = useRouter();
 
-  const handleAccountIconClick = () => {
-    router.push(SwitchRoutesWeb.AccountSavings);
-  };
 
   const UserButtons = ({ onClick }: { onClick: () => void }) => (
     <div className="hidden xl:flex xl:flex-row xl:gap-4 xl:justify-between">
@@ -28,7 +25,7 @@ export default function WebHeader() {
   const GuestButtons = () => (
     <Link
       className="border-2 border-red-600 text-black hover:text-black rounded-full flex flex-row justify-center items-center gap-4  py-2 font-bold"
-      href={SwitchRoutesWeb.Welcome}
+      href="#"
     >
 
       Iniciar sesión

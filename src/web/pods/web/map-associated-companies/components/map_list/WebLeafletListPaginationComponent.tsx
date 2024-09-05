@@ -49,7 +49,7 @@ export const WebLeafletListPaginationComponent = () => {
   };
 
   const handleRowClick = (row: WebMapBranchModel) => {
-    router.push(`${SwitchRoutesWeb.AssociatedDetails}/${row.code}`);
+    router.push(`${SwitchRoutesWeb.AssociatedCompaniesDetails}/${row.code}`);
   };
 
   const totalPages = Math.ceil(verticalList.length / rowsPerPage);

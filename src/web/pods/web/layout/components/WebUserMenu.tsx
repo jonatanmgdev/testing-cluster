@@ -38,7 +38,7 @@ export const WebUserMenu: FC<WebUserMenuProps> = ({
       ) : (
         <Link
           className="py-2  border-2 border-red-600 text-black w-full hover:text-black rounded-full flex flex-row justify-center items-center gap-3"
-          href={SwitchRoutesWeb.Welcome}
+          href="#"
         >
 
           Iniciar sesión

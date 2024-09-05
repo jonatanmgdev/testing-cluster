@@ -11,11 +11,14 @@ export const adminMenuRoutes: MenuRoute[] = [
       {
         text: "Notificaciones",
         link: SwitchRoutesAdmin.Notifications,
+        shouldRender: true,
       },
       {
         text: "Añadir notificación",
         link: SwitchRoutesAdmin.AddNotification,
+        shouldRender: true,
       },
     ],
+    shouldRender: true,
   },
 ];

@@ -31,7 +31,7 @@ const WebLeafletHorizontalListComponent = () => {
               <div className="card flex flex-col max-w-[320px] min-h-[280px] rounded-lg bg-white p-6 shadow-md justify-around">
                 <div
                   className="flex w-full cursor-pointer gap-2"
-                  onClick={() => router.push(`${SwitchRoutesWeb.AssociatedDetails}/${branch.code}`)}
+                  onClick={() => router.push(`${SwitchRoutesWeb.AssociatedCompaniesDetails}/${branch.code}`)}
                 >
                   <div className="py-4 w-full">
                     <div className="line-clamp-1 mb-2 text-xl font-bold">{branch.name}</div>

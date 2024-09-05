@@ -63,7 +63,7 @@ export const WebAssociatedDetailsComponent = ({ associatedDetails }: WebAssociat
 
   const handleBranchAddresses = () => {
     router.push(
-      `${company.code}${SwitchRoutesWeb.Addresses}${SwitchRoutesWeb.Latitude}=${latitude}${SwitchRoutesWeb.Longitude}=${longitude}`
+      `${company.code}${SwitchRoutesWeb.Addresses}latitude=${latitude}longitude=${longitude}`
     );
   };
 

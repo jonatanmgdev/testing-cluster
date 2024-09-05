@@ -65,7 +65,7 @@ export default function WebFooter() {
                   <Link href={`${SwitchRoutesWeb.GeneralConditions}`} className="text-inherit">Condiciones de uso</Link>
                 </li>
                 <li>
-                  <Link href={SwitchRoutesWeb.PrivacyPolicy} className="text-inherit">Política de privacidad</Link>
+                  <Link href="#" className="text-inherit">Política de privacidad</Link>
                 </li>
                 <li>
                   <Link href={SwitchRoutesWeb.DataProtection} className="text-inherit">Política de cookies</Link>
