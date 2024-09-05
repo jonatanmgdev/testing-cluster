@@ -32,7 +32,7 @@ export async function getVentajonMarkets(uuid: string) {
   }
 }
 
-export function withCookiesTestMiddleware(middleware: CustomMiddleware) {
+export function withCookiesMiddleware(middleware: CustomMiddleware) {
   return async (request: NextRequest, event: NextFetchEvent) => {
 
     let response = NextResponse.next();
@@ -62,8 +62,6 @@ export function withCookiesTestMiddleware(middleware: CustomMiddleware) {
 
     const markets: Market[] = await getVentajonMarkets(webVentajonUuid);
 
-    console.log(markets);
-
     let matchingMarket: Market | undefined;
 
     function isMarket(value: any): value is Market {
@@ -73,14 +71,12 @@ export function withCookiesTestMiddleware(middleware: CustomMiddleware) {
     switch (true) {
       case !userMarketDoesNotExists && !marketParam:
         // Caso 1: No hay webVentajonUuid y no hay marketParam
-        console.log("Caso 1");
         matchingMarket = markets.find((market) => market.default);
         response.cookies.set(CookieNames.UserMarket, JSON.stringify(matchingMarket));
         break;
 
       case !userMarketDoesNotExists && !!marketParam:
         // Caso 2: No hay userMarketCookie y hay marketParam
-        console.log("Caso 2");
         matchingMarket =
           markets.find((market: Market) => market.code === marketParam) ||
           markets.find((market) => market.default);
@@ -89,21 +85,15 @@ export function withCookiesTestMiddleware(middleware: CustomMiddleware) {
 
       case userMarketDoesNotExists && !!marketParam:
         // Caso 3: Hay userMarketCookie y marketParam
-        console.log("Caso 3");
-        console.log(markets);
-        console.log(marketParam);
         matchingMarket = markets.find((market: Market) => market.code === marketParam);
-        console.log(matchingMarket);
         if (!matchingMarket) {
           matchingMarket = markets.find((market) => market.default);
         }
-        console.log(matchingMarket);
         response.cookies.set(CookieNames.UserMarket, JSON.stringify(matchingMarket));
         break;
 
       case userMarketDoesNotExists && !marketParam:
         // Caso 4: Hay UserMarketCookie y NO hay marketParam
-        console.log("Caso 4");
         const userMarketCookie = request.cookies.get(CookieNames.UserMarket);
         if (userMarketCookie) {
           const marketData = JSON.parse(userMarketCookie.value);
@@ -121,13 +111,10 @@ export function withCookiesTestMiddleware(middleware: CustomMiddleware) {
 
       default:
         // En caso de que ningún caso anterior sea verdadero
-        console.log("Caso 5 DEFAULT");
         matchingMarket = markets.find((market) => market.default);
         response.cookies.set(CookieNames.UserMarket, JSON.stringify(matchingMarket));
         break;
     }
-
-    console.log(matchingMarket);
 
     return middleware(request, event, response);
   };

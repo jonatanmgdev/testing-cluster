@@ -1,5 +1,6 @@
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { CustomMiddleware } from "./chain";
+import { ParameterizedRoutes } from "./data/routesMiddlewareData";
 import {
   CookieNames,
   marketCookieTypes,
@@ -10,10 +11,16 @@ import {
 } from "@/web/core/config";
 import {
   AuthAvoidPublicRoutes,
+  ParametizedRoute,
   privatedRoutesLists,
 } from "./data/routesMiddlewareData";
+import {
+  getOrFixRouteParam,
+  isMatchingParamRoute,
+  isValidRouteParam,
+} from "./utils/paramRoutesHelper";
 
-export function withRoutesTestMiddleware(middleware: CustomMiddleware) {
+export function withRoutesMiddleware(middleware: CustomMiddleware) {
   return async (
     request: NextRequest,
     event: NextFetchEvent,
@@ -112,50 +119,32 @@ export function withRoutesTestMiddleware(middleware: CustomMiddleware) {
 
     // Check if the route need a specific param
 
-    function isMatchingParamRoute(urlPathname: string): boolean {
-      // TODO: Convert this comparision to enum
-      if (urlPathname === SwitchRoutesWeb.AssociatedCompaniesMap) return true;
-      return false;
-    }
+    const matchingParamRoute = isMatchingParamRoute(url.pathname);
 
-    isParamPage = isMatchingParamRoute(url.pathname);
-
-    // Verifica si la URL tiene el parámetro tab y si es válido (map o list)
-    function isValidTabParam(tabParam: string | null): boolean {
-      return tabParam === "map" || tabParam === "list";
-    }
-
-    // Verifica si el valor del parámetro tab está presente y es válido
-    function checkAndFixTabParam(searchParams: URLSearchParams): string {
-      const tabParam = searchParams.get("tab");
-
-      if (!tabParam || !isValidTabParam(tabParam)) {
-        // Si no hay parámetro tab o no es válido, devolver 'map' por defecto
-        return "map";
-      }
-
-      // Si es válido, devolver el valor actual
-      return tabParam;
-    }
-
-    // Ejemplo de uso en el código principal
-    isParamPage = isMatchingParamRoute(url.pathname);
-
-    if (isParamPage) {
-      const currentTab = checkAndFixTabParam(searchParams);
+    if (matchingParamRoute) {
+      // Obtener o corregir el valor del parámetro específico para esta ruta
+      const currentParamValue = getOrFixRouteParam(searchParams, matchingParamRoute);
 
       if (searchParams.size > 0) {
         const params = searchParams.toString();
         let paramsUpdated = params;
 
-        if (!isValidTabParam(searchParams.get("tab"))) {
-          // Si el tab no es válido o no existe, actualizar la URL
-          if (params.includes("tab=")) {
-            // Si ya existe el parámetro tab, reemplazarlo
-            paramsUpdated = params.replace(/tab=[^&]*/, `tab=${currentTab}`);
+        // Si el valor actual del parámetro no es válido, corregirlo
+        if (
+          !isValidRouteParam(
+            searchParams.get(matchingParamRoute.param),
+            matchingParamRoute.validValues
+          )
+        ) {
+          // Si ya existe el parámetro, reemplazarlo
+          if (params.includes(`${matchingParamRoute.param}=`)) {
+            paramsUpdated = params.replace(
+              new RegExp(`${matchingParamRoute.param}=[^&]*`),
+              `${matchingParamRoute.param}=${currentParamValue}`
+            );
           } else {
-            // Si no existe el parámetro tab, agregarlo
-            paramsUpdated = `${params}&tab=${currentTab}`;
+            // Si no existe el parámetro, agregarlo
+            paramsUpdated = `${params}&${matchingParamRoute.param}=${currentParamValue}`;
           }
           return NextResponse.redirect(
             new URL(`${url.pathname}?${paramsUpdated}`, url)
@@ -163,10 +152,13 @@ export function withRoutesTestMiddleware(middleware: CustomMiddleware) {
         }
       }
 
-      // Si no hay parámetros en la URL, agregar el parámetro tab por defecto
+      // Si no hay parámetros en la URL, agregar el parámetro con el valor por defecto
       if (searchParams.size === 0) {
         return NextResponse.redirect(
-          new URL(`${url.pathname}?tab=${currentTab}`, url)
+          new URL(
+            `${url.pathname}?${matchingParamRoute.param}=${currentParamValue}`,
+            url
+          )
         );
       }
     }

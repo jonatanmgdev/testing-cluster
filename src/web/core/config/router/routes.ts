@@ -27,7 +27,7 @@ export enum SwitchRoutesWeb {
   AppleCallback = "/callback/apple",
   ArcoRights = "/derechos-acceso",
   AssociatedCompanies = "/empresas-asociadas",
-  AssociatedCompaniesDetails = "/empresas-asociadas/detalles/",
+  AssociatedCompaniesDetails = "/map-associated-companies/details/",
   AssociatedCompaniesMap = "/map-associated-companies",
   Cards = "/tarjeta",
   ConfirmationEmail = "/confirmation-email",

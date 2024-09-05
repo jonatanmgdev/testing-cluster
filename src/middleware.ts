@@ -1,9 +1,9 @@
 "use server";
 import { chain } from "./middlewares/chain";
-import { withCookiesTestMiddleware } from "./middlewares/cookiesMiddleware";
-import { withRoutesTestMiddleware } from "./middlewares/routesMiddleware";
+import { withCookiesMiddleware } from "./middlewares/cookiesMiddleware";
+import { withRoutesMiddleware } from "./middlewares/routesMiddleware";
 
-export default chain([withCookiesTestMiddleware, withRoutesTestMiddleware])
+export default chain([withCookiesMiddleware, withRoutesMiddleware])
 
 export const config = {
     matcher: [

@@ -11,6 +11,29 @@ interface ProtectedRoute {
   redirectPath: string;
 }
 
+export interface ParametizedRoute {
+  path: string;
+  param: string;
+  validValues: string[];
+  defaultValue: string;
+}
+
+// Routes with params
+export const ParameterizedRoutes: ParametizedRoute[] = [
+  {
+    path: `${SwitchRoutesWeb.AssociatedCompaniesDetails}`,
+    param: 'tablita',
+    validValues: ['map', 'list'],
+    defaultValue: 'map',
+  },
+  {
+    path: `${SwitchRoutesWeb.AssociatedCompaniesMap}`,
+    param: 'tab',
+    validValues: ['map', 'list'],
+    defaultValue: 'map',
+  },
+];
+
 // Routes to avoid loading if the user is authenticated.
 export const AuthAvoidPublicRoutes: ProtectedRoute[] = [
   {
