@@ -19,11 +19,6 @@ export const AuthAvoidPublicRoutes: ProtectedRoute[] = [
     redirectPath: SwitchRoutesWeb.Home,
   },
   {
-    path: `${SwitchRoutesWeb.Welcome}`,
-    cookieName: CookieNames.WebAuth,
-    redirectPath: SwitchRoutesWeb.Home,
-  },
-  {
     path: `${SwitchRoutesWeb.Register}`,
     cookieName: CookieNames.WebAuth,
     redirectPath: SwitchRoutesWeb.Home,
@@ -34,32 +29,31 @@ export const AuthAvoidPublicRoutes: ProtectedRoute[] = [
     redirectPath: SwitchRoutesAdmin.Notifications,
   },
   {
-    path: `${SwitchRoutesCompanies.login}`,
+    path: `${SwitchRoutesCompanies.Login}`,
     cookieName: CookieNames.CompaniesAuth,
-    redirectPath: SwitchRoutesCompanies.home,
+    redirectPath: SwitchRoutesCompanies.Home,
   },
 ];
-
 
 // WEB privated routes
 const webPrivatedRoutes: ProtectedRoute[] = [
   {
-    path: `${SwitchRoutesWeb.AccountSavings}`,
-    cookieName: CookieNames.WebAuth,
-    redirectPath: SwitchRoutesWeb.Welcome,
-  },
-  {
-    path: `${SwitchRoutesWeb.AccountLinkCard}`,
+    path: `${SwitchRoutesWeb.Account}`,
     cookieName: CookieNames.WebAuth,
     redirectPath: SwitchRoutesWeb.Login,
   },
   {
-    path: `${SwitchRoutesWeb.AccountRequestCard}`,
+    path: `${SwitchRoutesWeb.AccountCardLink}`,
     cookieName: CookieNames.WebAuth,
     redirectPath: SwitchRoutesWeb.Login,
   },
   {
-    path: `${SwitchRoutesWeb.AccountRequestCardInfo}`,
+    path: `${SwitchRoutesWeb.AccountCardRequest}`,
+    cookieName: CookieNames.WebAuth,
+    redirectPath: SwitchRoutesWeb.Login,
+  },
+  {
+    path: `${SwitchRoutesWeb.AccountCardRequestInfo}`,
     cookieName: CookieNames.WebAuth,
     redirectPath: SwitchRoutesWeb.Login,
   },
@@ -68,9 +62,9 @@ const webPrivatedRoutes: ProtectedRoute[] = [
 // COMPANIES privated routes
 const companiesPrivatedRoutes: ProtectedRoute[] = [
   {
-    path: `${SwitchRoutesCompanies.home}`,
+    path: `${SwitchRoutesCompanies.Home}`,
     cookieName: CookieNames.CompaniesAuth,
-    redirectPath: `${SwitchRoutesCompanies.login}`,
+    redirectPath: `${SwitchRoutesCompanies.Login}`,
   },
 ];
 

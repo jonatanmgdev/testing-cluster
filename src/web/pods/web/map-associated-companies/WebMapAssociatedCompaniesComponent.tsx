@@ -36,13 +36,13 @@ const WebMapAssociatedCompaniesComponent: React.FC<{}> = () => {
 
   console.log(loadedData.branches.length);
 
-  useEffect(() => {
-    console.log("tabParam");
-    let tabParam = searchParams.get("tab");
-    if (tabParam === null) {
-      router.push("?tab=map");
-    }
-  }, [router, searchParams]);
+  // useEffect(() => {
+  //   console.log("tabParam");
+  //   let tabParam = searchParams.get("tab");
+  //   if (tabParam === null) {
+  //     router.push("?tab=map");
+  //   }
+  // }, [router, searchParams]);
 
 
   useEffect(() => {
@@ -96,9 +96,7 @@ const WebMapAssociatedCompaniesComponent: React.FC<{}> = () => {
     }
   }, [loadedData.branches, loadedData.categories, loadedData.markets]);
 
-  console.log("LOADED branches", loadedData.branches.length);
-  console.log("LOADED categories", loadedData.categories.length);
-  console.log("LOADED markets", loadedData.markets.length);
+
 
   loadedData.branches = loadedData.branches.map((item) => ({
     ...item,
@@ -110,6 +108,7 @@ const WebMapAssociatedCompaniesComponent: React.FC<{}> = () => {
 
   if (!dataLoaded)
     return <CommonCircularProgress sizeCircular={"100"} textLoading={"Cargando..."} />;
+  
 
   return (
     <>
