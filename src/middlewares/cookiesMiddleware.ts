@@ -1,36 +1,9 @@
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { CustomMiddleware } from "./chain";
-import axios from "axios";
 import { CookieNames, cookieUuidNames } from "@/web/core/config";
 import { Market } from "@/web/types";
+import { getVentajonMarkets } from "./utils/marketCookieHelper";
 
-export async function getVentajonMarkets(uuid: string) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-
-  try {
-    const res = await axios.get(`${apiUrl}` + "v1/associates/markets", {
-      headers: {
-        "session-uuid": uuid,
-      },
-    });
-    return res.data;
-  } catch (error) {
-    // Si hay un error en la petición, retornamos el valor por defecto
-    console.error("Error fetching Ventajon markets:", error);
-
-    // Valor por defecto en caso de error
-    return [
-      {
-        code: "BA",
-        name: "Islas Baleares",
-        latitude: 39.3809745,
-        longitude: 2.7611732,
-        zoom_level: 8,
-        default: true,
-      },
-    ];
-  }
-}
 
 export function withCookiesMiddleware(middleware: CustomMiddleware) {
   return async (request: NextRequest, event: NextFetchEvent) => {
