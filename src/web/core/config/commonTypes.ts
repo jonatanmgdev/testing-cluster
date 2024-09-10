@@ -25,5 +25,5 @@ export interface layoutParams {
 
  export interface LayoutInterface {
   children: ReactNode;
-  params: layoutParams;
+  params: { locale: string };
  }

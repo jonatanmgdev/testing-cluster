@@ -29,9 +29,9 @@ export const CommonSuccessScreen: FC<CommonSuccessScreenProps> = ({
       <h3 className="font-eufoniem">¡Formulario enviado con éxito!</h3>
       <p>Te contactaremos con la mayor brevedad posible.</p>
       <div className="flex justify-center">
-        <Link href={href} className={linkClasses}>
+        {/* <Link href={href} className={linkClasses}>
           {linkText}
-        </Link>
+        </Link> */}
       </div>
       {additionalContent}
     </div>

@@ -2,12 +2,13 @@
 import { chain } from "./middlewares/chain";
 import { withCookiesMiddleware } from "./middlewares/cookiesMiddleware";
 import { withRoutesMiddleware } from "./middlewares/routesMiddleware";
+import { withTranslationsMiddleware } from "./middlewares/translationMiddleware";
 
-export default chain([withCookiesMiddleware, withRoutesMiddleware])
+export default chain([withTranslationsMiddleware, withCookiesMiddleware, withRoutesMiddleware])
 
 export const config = {
-    matcher: [
-      "/((?!_next/static|_next/image|public/|assets/|favicon.ico|robots.txt|sitemap.xml|manifest.json).*)",
-    ],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|apple-touch-icon.png|favicon.svg|images/books|icons|manifest).*)'
+  ]
   };
 

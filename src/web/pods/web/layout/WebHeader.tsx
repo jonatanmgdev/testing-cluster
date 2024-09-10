@@ -42,9 +42,7 @@ export default function WebHeader() {
           ref={containerRef}
         >
           <div>
-            <Link href={SwitchRoutesWeb.Home}>
 
-            </Link>
           </div>
           <div className="hidden lg:block  w-full">
             <div className="p-2 text-white flex justify-center items-center text-center">

@@ -6,15 +6,15 @@ import { getVentajonMarkets } from "./utils/marketCookieHelper";
 
 
 export function withCookiesMiddleware(middleware: CustomMiddleware) {
-  return async (request: NextRequest, event: NextFetchEvent) => {
+  return async (request: NextRequest, event: NextFetchEvent, response : NextResponse) => {
 
-    let response = NextResponse.next();
     const hasVentajonUuidsCookie = request.cookies.get(CookieNames.ventajonUuids);
     let ventajonUuidsValue = hasVentajonUuidsCookie ? request.cookies.get(CookieNames.ventajonUuids)!.value : "";
     const userMarketDoesNotExists = request.cookies.get(CookieNames.ventajonUuids);
     const searchParams = request.nextUrl.searchParams;
     let marketParam = searchParams.get("market");
 
+    // // const hasNextLocaleCookie = request.cookies.get(CookieNames.UserLocale);
 
     if (!hasVentajonUuidsCookie) {
       ventajonUuidsValue = JSON.stringify({

@@ -61,7 +61,7 @@ export default function WebFooter() {
             <p className="font-bold pb-2">Enlaces de interés</p>
             <div className="sm:pb-5">
               <ul className="space-y-2">
-                <li>
+                {/* <li>
                   <Link href={`${SwitchRoutesWeb.GeneralConditions}`} className="text-inherit">Condiciones de uso</Link>
                 </li>
                 <li>
@@ -69,7 +69,7 @@ export default function WebFooter() {
                 </li>
                 <li>
                   <Link href={SwitchRoutesWeb.DataProtection} className="text-inherit">Política de cookies</Link>
-                </li>
+                </li> */}
               </ul>
             </div>
           </div>

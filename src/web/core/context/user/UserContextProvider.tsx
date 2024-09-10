@@ -60,6 +60,7 @@ export const UserContextProvider = ({ children, webAuth, marketCookie }: Context
     setIsMarketsLoading(true);
     try {
       const { data, status } = await getMarkets();
+      console.log(data);
       if (status == apiStatus.Success && data) {
         setMarkets(data);
         return data;
@@ -81,7 +82,7 @@ export const UserContextProvider = ({ children, webAuth, marketCookie }: Context
       }
     };
     handleCookie();
-    handleMarkets();
+    // handleMarkets();
   }, []);
 
   const resetUserInfo = () => {
